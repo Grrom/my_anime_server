@@ -6,10 +6,15 @@ const hostname = '127.0.0.1';
 const port = 3000;
 
 http.createServer((request: any, response: any) => {
-    console.log("got a request");
+
     switch (request.url) {
-        case "/":
-            response.writeHead(200, { "Content-Type": "application/json" });
+        case "/anime-list":
+            console.log(request);
+            response.writeHead(200, {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "http://localhost:8080",
+                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+            });
             response.write(animeList());
             break;
         default:

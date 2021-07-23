@@ -1,27 +1,40 @@
-import { statSync } from "fs";
+import { F_OK } from "constants";
+import { access, constants, PathLike, readFile, statSync, write, writeFile } from "fs";
+import path from "path/posix";
 
 const http = require('http');
-const url = require('url');
+const { parse } = require('url');
 
-const { readdirSync, stat, createReadStream } = require('fs');
+const { acces, readdirSync, stat, createReadStream } = require('fs');
 
 const hostname = '127.0.0.1';
 const port = 3000;
 
 http.createServer((request: any, response: any) => {
 
-    switch (url.parse(request.url, true).pathname) {
+    switch (parse(request.url, true).pathname) {
         case "/anime-list":
             response.writeHead(200, {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "http://localhost:8080",
-                "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+                "Access-Control-Allow-Methods": "GET",
             });
             response.write(animeList());
             response.end();
             break;
+        case "/save-progress":
+            response.writeHead(200, {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "http://localhost:8080",
+                "Access-Control-Allow-Methods": "POST",
+            });
+            console.log(parse(request.url, true))
+            // response.write(saveProgress());
+            response.write(JSON.stringify("saveProgress()"));
+            response.end()
+            break;
         case "/video":
-            const query = url.parse(request.url, true).query;
+            const query = parse(request.url, true).query;
             const requestVideo = `./anime/${query.anime}/${query.episode}`;
             const videoSize = statSync(requestVideo).size;
 
@@ -38,7 +51,7 @@ http.createServer((request: any, response: any) => {
                     "Content-Type": "video/mp4",
                     "Access-Control-Allow-Origin": "http://localhost:8080",
                     "Access-Control-Allow-Headers": "Range",
-                    "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+                    "Access-Control-Allow-Methods": "GET",
                 });
 
                 createReadStream(requestVideo, { start, end }).pipe(response)
@@ -56,13 +69,12 @@ http.createServer((request: any, response: any) => {
                         "Accept-Ranges": "bytes",
                         "Access-Control-Allow-Headers": "Range",
                         "Access-Control-Allow-Origin": "http://localhost:8080",
-                        "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
+                        "Access-Control-Allow-Methods": "GET",
                     });
 
                     createReadStream(requestVideo).pipe(response);
                 })
             }
-
             break;
         default:
             response.writeHead(
@@ -70,7 +82,7 @@ http.createServer((request: any, response: any) => {
                 "Access-Control-Allow-Origin": "http://localhost:8080",
                 "Access-Control-Allow-Methods": "GET,PUT,POST,DELETE",
             });
-            console.log(url.parse(request.url, true).pathname)
+            console.log(parse(request.url, true).pathname)
             response.write(JSON.stringify("hello"))
             response.end()
     }
@@ -87,4 +99,18 @@ const animeList = (): string => {
     return JSON.stringify(animes);
 }
 
-
+const saveProgress = () => {
+    let x: String = JSON.stringify("none");
+    access("./records.json", F_OK, (err) => {
+        if (err) {
+        } else {
+            readFile("./records.json", "utf8", (err, file) => {
+                file = JSON.parse(file);
+                writeFile("./records.json", JSON.stringify(file), function (err) {
+                    if (err) throw err;
+                    console.log("written")
+                })
+            })
+        }
+    })
+}

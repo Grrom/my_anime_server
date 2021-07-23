@@ -11,15 +11,6 @@ new AnimeServer();
 //             animeList
 //             break;
 //         case "/save-progress":
-//             response.writeHead(200, {
-//                 "Content-Type": "application/json",
-//                 "Access-Control-Allow-Origin": "http://localhost:8080",
-//                 "Access-Control-Allow-Methods": "POST",
-//             });
-//             console.log(parse(request.url, true))
-//             // response.write(saveProgress());
-//             response.write(JSON.stringify("saveProgress()"));
-//             response.end()
 //             break;
 //         case "/video":
 //             const query = parse(request.url, true).query;

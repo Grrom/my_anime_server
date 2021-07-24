@@ -1,5 +1,4 @@
 import { animeList, video } from "../methods/get";
-import { saveProgress } from "../methods/post";
 
 export function getRoutes(request: any, response: any) {
     const baseURL = `${request.headers.referer.split(":")[0]}://${request.headers.host}/`;
@@ -10,13 +9,6 @@ export function getRoutes(request: any, response: any) {
             const listResponse = animeList();
             response.writeHead(listResponse.statusCode, listResponse.headers)
             response.write(listResponse.data);
-            response.end();
-            break;
-
-        case "/save-progress":
-            const saveResponse = saveProgress();
-            response.writeHead(saveResponse.statusCode, saveResponse.headers)
-            response.write(saveResponse.data);
             response.end();
             break;
 

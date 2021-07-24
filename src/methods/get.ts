@@ -12,7 +12,7 @@ export function animeList(): ApiResponse<String> {
         if (animeName !== ".keep")
             animes[animeName] = readdirSync(`./anime/${animeName}`);
     });
-    return { data: JSON.stringify(animes), headers: headers, statusCode: 200 };
+    return { statusCode: 200, headers: headers, data: JSON.stringify(animes) };
 
 }
 
@@ -47,6 +47,6 @@ export function video(requestUrl: URL, requestHeaders: any): ApiResponse<ReadStr
             "Access-Control-Allow-Origin": "http://localhost:8080",
             "Access-Control-Allow-Methods": "GET",
         };
-        return { data: createReadStream(requestVideo), headers: headers, statusCode: 200 };
+        return { statusCode: 200, headers: headers, data: createReadStream(requestVideo) };
     };
 }

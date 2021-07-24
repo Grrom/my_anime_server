@@ -6,7 +6,7 @@ export function postRoutes(request: any, response: any) {
     switch (requestUrl.pathname) {
 
         case "/save-progress":
-            const saveResponse = saveProgress();
+            const saveResponse = saveProgress(request);
             response.writeHead(saveResponse.statusCode, saveResponse.headers)
             response.write(saveResponse.data);
             response.end();
@@ -16,9 +16,8 @@ export function postRoutes(request: any, response: any) {
             const headers = {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "http://localhost:8080",
-                "Access-Control-Allow-Methods": "GET",
+                "Access-Control-Allow-Methods": "POST",
             }
-            console.log(requestUrl)
             response.writeHead(200, headers)
             response.write(JSON.stringify("testing"))
             response.end()

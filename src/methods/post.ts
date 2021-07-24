@@ -31,7 +31,7 @@ export function saveProgress(request: any): ApiResponse<String> {
                 saveToFile(body);
             } else {
                 const file = readFileSync(fileName, "utf8");
-                let watched: AnimeList = file.length !== 0 ? JSON.parse(file) : {};
+                let watched: AnimeList<String> = file.length !== 0 ? JSON.parse(file) : {};
 
                 if (watched[body.name] === undefined)
                     watched[body.name] = [];

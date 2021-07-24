@@ -1,5 +1,5 @@
-export interface AnimeList {
-    [key: string]: Array<String>
+export interface AnimeList<T> {
+    [key: string]: Array<T>
 }
 
 export interface WatchedAnime {

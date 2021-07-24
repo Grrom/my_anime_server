@@ -1,19 +1,37 @@
-import { createReadStream, readdirSync, ReadStream, statSync } from "fs";
+import { createReadStream, readdirSync, readFileSync, ReadStream, statSync } from "fs";
 import { AnimeList, ApiResponse } from "../types/types";
 
 export function animeList(): ApiResponse<String> {
-    let animes: AnimeList = {};
     const headers = {
         "Content-Type": "application/json",
         "Access-Control-Allow-Origin": "http://localhost:8080",
         "Access-Control-Allow-Methods": "GET",
     }
-    readdirSync("./anime").forEach((animeName: string) => {
-        if (animeName !== ".keep")
-            animes[animeName] = readdirSync(`./anime/${animeName}`);
-    });
-    return { statusCode: 200, headers: headers, data: JSON.stringify(animes) };
 
+    let watchedAnimes: AnimeList<String> = {};
+    try {
+        watchedAnimes = JSON.parse(readFileSync("./watched.json", "utf8"));
+    } catch (error) {
+        if (error.code === "ENOENT")
+            console.log("File Doesn't exist")
+    }
+
+    let animes: AnimeList<String> = {};
+    readdirSync("./anime").forEach((animeName: string) => {
+        if (animeName !== ".keep") {
+            animes[animeName] = readdirSync(`./anime/${animeName}`);
+        }
+    });
+
+    let animeList: AnimeList<{ episode: String, watched: Boolean }> = {};
+    Object.keys(animes).forEach((animeName) => {
+        animeList[animeName] = [];
+        animes[animeName].forEach((episode) => {
+            animeList[animeName].push({ episode: episode, watched: watchedAnimes[animeName] ? watchedAnimes[animeName].includes(episode) : false })
+        })
+    })
+
+    return { statusCode: 200, headers: headers, data: JSON.stringify(animeList) };
 }
 
 export function video(requestUrl: URL, requestHeaders: any): ApiResponse<ReadStream> {

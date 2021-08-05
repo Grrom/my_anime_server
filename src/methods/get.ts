@@ -8,7 +8,7 @@ export function animeList(): ApiResponse<String> {
         "Access-Control-Allow-Methods": "GET",
     }
 
-    let watchedAnimes: AnimeList<String> = {};
+    let watchedAnimes: AnimeList<{ episode: string, timeStamp: number }> = {};
     try {
         watchedAnimes = JSON.parse(readFileSync("./watched.json", "utf8"));
     } catch (error) {
@@ -16,18 +16,23 @@ export function animeList(): ApiResponse<String> {
             console.log("File Doesn't exist")
     }
 
-    let animes: AnimeList<String> = {};
+    let animes: AnimeList<string> = {};
     readdirSync("./anime").forEach((animeName: string) => {
         if (animeName !== ".keep") {
             animes[animeName] = readdirSync(`./anime/${animeName}`);
         }
     });
 
-    let animeList: AnimeList<{ episode: String, watched: Boolean }> = {};
+    let animeList: AnimeList<{ episode: String, watched: Boolean, timeStamp: number }> = {};
     Object.keys(animes).forEach((animeName) => {
         animeList[animeName] = [];
-        animes[animeName].forEach((episode) => {
-            animeList[animeName].push({ episode: episode, watched: watchedAnimes[animeName] ? watchedAnimes[animeName].includes(episode) : false })
+        animes[animeName].forEach((episode: string) => {
+            let selectedIndex = watchedAnimes[animeName] !== undefined ? watchedAnimes[animeName].map(anime => anime.episode).indexOf(episode) : -1
+            animeList[animeName].push({
+                episode: episode,
+                watched: selectedIndex >= 0,
+                timeStamp: selectedIndex >= 0 ? watchedAnimes[animeName][selectedIndex].timeStamp : 0
+            })
         })
     })
 

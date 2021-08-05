@@ -26,19 +26,30 @@ export function saveProgress(request: any): ApiResponse<String> {
     async function saveToFile(body: WatchedAnime) {
         const fileName: PathLike = "./watched.json"
         access(fileName, F_OK, (error) => {
+            let proceedWriting = false;
             if (error) {
                 openSync(fileName, "w");
                 saveToFile(body);
             } else {
                 const file = readFileSync(fileName, "utf8");
-                let watched: AnimeList<String> = file.length !== 0 ? JSON.parse(file) : {};
+                let watched: AnimeList<{ episode: string, timeStamp: number }> = file.length !== 0 ? JSON.parse(file) : {};
 
                 if (watched[body.name] === undefined)
                     watched[body.name] = [];
-                if (watched[body.name].includes(body.episode)) {
-                    console.log("saved already");
+
+
+                if (watched[body.name].map((anime) => anime.episode).includes(body.episode)) {
+                    if (body.timeStamp !== undefined) {
+                        let selectedIndex = watched[body.name].map(anime => anime.episode).indexOf(body.episode)
+                        watched[body.name][selectedIndex].timeStamp = body.timeStamp
+                        proceedWriting = true
+                    }
                 } else {
-                    watched[body.name].push(body.episode);
+                    watched[body.name].push({ episode: body.episode, timeStamp: 0 });
+                    proceedWriting = true
+                }
+
+                if (proceedWriting) {
                     writeFile(fileName, JSON.stringify(watched), function (err) {
                         if (err) throw err;
                     });

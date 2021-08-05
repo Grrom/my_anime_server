@@ -5,6 +5,7 @@ export interface AnimeList<T> {
 export interface WatchedAnime {
     name: string,
     episode: string,
+    timeStamp: number,
 }
 
 export interface ApiResponse<T> {

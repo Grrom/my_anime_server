@@ -8,6 +8,7 @@ export class AnimeServer {
 
     constructor() {
         createServer(function (request: any, response: any) {
+
             switch (request.method) {
                 case "GET":
                     getRoutes(request, response);

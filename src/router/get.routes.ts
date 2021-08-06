@@ -1,9 +1,18 @@
-import { animeList, video } from "../methods/get";
+import { animeList, getAsset, MyAnimeClient, video } from "../methods/get";
 
 export function getRoutes(request: any, response: any) {
-    const baseURL = `${request.headers.referer.split(":")[0]}://${request.headers.host}/`;
+    const baseURL = `${request.headers.referer !== undefined ? request.headers.referer.split(":")[0] : "http"}://${request.headers.host}/`;
     const requestUrl: URL = new URL(request.url, baseURL);
+
+
     switch (requestUrl.pathname) {
+
+        case "/":
+            const pageResponse = MyAnimeClient();
+            response.writeHead(pageResponse.statusCode, pageResponse.headers)
+            response.write(pageResponse.data)
+            response.end();
+            break;
 
         case "/anime-list":
             const listResponse = animeList();
@@ -19,15 +28,26 @@ export function getRoutes(request: any, response: any) {
             break;
 
         default:
-            const headers = {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "http://localhost:8080",
-                "Access-Control-Allow-Methods": "GET",
+
+            let requestExtension = requestUrl.pathname.split('.').pop()
+            if (["js"].includes(requestExtension!)) {
+                const assetResponse = getAsset(requestExtension!);
+                response.writeHead(assetResponse.statusCode, assetResponse.headers)
+                response.write(assetResponse.data)
+                response.end();
+            } else {
+                const headers = {
+                    "Content-Type": "application/json; charset=UTF-8",
+                    "Access-Control-Allow-Origin": "http://localhost:8080",
+                    "Access-Control-Allow-Methods": "GET",
+                }
+                console.log("didn't get any matches")
+                console.log(requestUrl.pathname)
+                response.writeHead(200, headers)
+                response.write(JSON.stringify("no endpoint matched"))
+                response.end()
             }
-            console.log(requestUrl)
-            response.writeHead(200, headers)
-            response.write(JSON.stringify("testing"))
-            response.end()
+
             break;
     }
 }

@@ -73,3 +73,41 @@ export function video(requestUrl: URL, requestHeaders: any): ApiResponse<ReadStr
         return { statusCode: 200, headers: headers, data: createReadStream(requestVideo) };
     };
 }
+
+export function MyAnimeClient(): ApiResponse<string> {
+    const headers = {
+        "Content-Type": "text/html",
+        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Methods": "GET",
+    }
+
+    let page = readFileSync("./src/client/index.html", "utf8");
+
+    return { statusCode: 200, headers: headers, data: page };
+}
+
+export function getAsset(extension: string): ApiResponse<string> {
+    console.log("getting asset")
+
+    let contentType;
+    switch (extension) {
+        case "ttf":
+            contentType = "application/octet-stream"
+            break;
+        case "js":
+            contentType = "application/javascript"
+            break
+    }
+
+    const headers = {
+        "Content-Type": contentType,
+        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Methods": "GET",
+    }
+
+    let assetRequested = readdirSync("./src/client", "utf-8").filter(file => file.match(new RegExp(`.*\.${extension}`, 'ig')))[0]
+
+    assetRequested = readFileSync(`./src/client/${assetRequested}`, "utf-8")
+
+    return { statusCode: 200, headers: headers, data: assetRequested };
+}

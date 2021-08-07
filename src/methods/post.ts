@@ -1,12 +1,13 @@
 import { F_OK } from "constants";
 import { access, PathLike, writeFile, openSync, readFileSync } from "fs";
+import { allowedOrigin } from "../helper";
 import { AnimeList, ApiResponse, WatchedAnime, } from "../types/types";
 
 export function saveProgress(request: any): ApiResponse<String> {
     const headers = {
         "Accept-Post": "application/json ",
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Origin": allowedOrigin(request.headers.origin),
         "Access-Control-Allow-Methods": "POST",
     };
 

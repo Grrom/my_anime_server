@@ -1,10 +1,11 @@
 import { createReadStream, readdirSync, readFileSync, ReadStream, statSync } from "fs";
+import { allowedOrigin } from "../helper";
 import { AnimeList, ApiResponse } from "../types/types";
 
-export function animeList(): ApiResponse<String> {
+export function animeList(origin: string): ApiResponse<String> {
     const headers = {
         "Content-Type": "application/json",
-        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Origin": allowedOrigin(origin),
         "Access-Control-Allow-Methods": "GET",
     }
 
@@ -56,7 +57,7 @@ export function video(requestUrl: URL, requestHeaders: any): ApiResponse<ReadStr
             "Accept-Ranges": "bytes",
             "Content-Length": end - start + 1,
             "Content-Type": "video/mp4",
-            "Access-Control-Allow-Origin": "http://localhost:8080",
+            "Access-Control-Allow-Origin": allowedOrigin(requestHeaders.origin),
             "Access-Control-Allow-Headers": "Range",
             "Access-Control-Allow-Methods": "GET",
         };
@@ -67,44 +68,49 @@ export function video(requestUrl: URL, requestHeaders: any): ApiResponse<ReadStr
             'Content-Type': 'video/mp4',
             "Accept-Ranges": "bytes",
             "Access-Control-Allow-Headers": "Range",
-            "Access-Control-Allow-Origin": "http://localhost:8080",
+            "Access-Control-Allow-Origin": allowedOrigin(requestHeaders.origin),
             "Access-Control-Allow-Methods": "GET",
         };
         return { statusCode: 200, headers: headers, data: createReadStream(requestVideo) };
     };
 }
 
-export function MyAnimeClient(): ApiResponse<string> {
+export function MyAnimeClient(origin: string): ApiResponse<string> {
     const headers = {
         "Content-Type": "text/html",
-        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Origin": allowedOrigin(origin),
         "Access-Control-Allow-Methods": "GET",
     }
 
-    let page = readFileSync("./src/client/index.html", "utf8");
+    let page = readFileSync("./client/index.html", "utf8");
 
     return { statusCode: 200, headers: headers, data: page };
 }
 
-export function getAsset(assetRequested: string, extension: string): ApiResponse<string> {
+export function getAsset(assetRequested: string, extension: string, origin: string): ApiResponse<string> {
 
     let contentType;
+    let encoding: BufferEncoding = "utf-8";
     switch (extension) {
         case "ttf":
             contentType = "application/octet-stream"
+            encoding = "utf-8"
+            // i'm not actually serving my fonts anymore im just linking to google fonts but
+            // I'll keep this piece of code here just in-case I need to host other files other than the javascript file
             break;
         case "js":
             contentType = "application/javascript"
+            encoding = "utf-8"
             break
     }
 
     const headers = {
         "Content-Type": contentType,
-        "Access-Control-Allow-Origin": "http://localhost:8080",
+        "Access-Control-Allow-Origin": allowedOrigin(origin),
         "Access-Control-Allow-Methods": "GET",
     }
 
-    assetRequested = readFileSync(`./src/client${assetRequested}`, "utf-8")
+    assetRequested = readFileSync(`./client${assetRequested}`, encoding)
 
     return { statusCode: 200, headers: headers, data: assetRequested };
 }

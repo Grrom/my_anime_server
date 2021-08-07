@@ -86,8 +86,7 @@ export function MyAnimeClient(): ApiResponse<string> {
     return { statusCode: 200, headers: headers, data: page };
 }
 
-export function getAsset(extension: string): ApiResponse<string> {
-    console.log("getting asset")
+export function getAsset(assetRequested: string, extension: string): ApiResponse<string> {
 
     let contentType;
     switch (extension) {
@@ -105,9 +104,7 @@ export function getAsset(extension: string): ApiResponse<string> {
         "Access-Control-Allow-Methods": "GET",
     }
 
-    let assetRequested = readdirSync("./src/client", "utf-8").filter(file => file.match(new RegExp(`.*\.${extension}`, 'ig')))[0]
-
-    assetRequested = readFileSync(`./src/client/${assetRequested}`, "utf-8")
+    assetRequested = readFileSync(`./src/client${assetRequested}`, "utf-8")
 
     return { statusCode: 200, headers: headers, data: assetRequested };
 }

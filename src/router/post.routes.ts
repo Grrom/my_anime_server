@@ -1,3 +1,4 @@
+import { noEndpoint } from "../helper";
 import { saveProgress } from "../methods/post";
 
 export function postRoutes(request: any, response: any) {
@@ -13,13 +14,9 @@ export function postRoutes(request: any, response: any) {
             break;
 
         default:
-            const headers = {
-                "Content-Type": "application/json",
-                "Access-Control-Allow-Origin": "http://localhost:8080",
-                "Access-Control-Allow-Methods": "POST",
-            }
-            response.writeHead(200, headers)
-            response.write(JSON.stringify("testing"))
+            let noEndpointResponse = noEndpoint(request)
+            response.writeHead(noEndpointResponse.statusCode, noEndpointResponse.headers)
+            response.write(noEndpointResponse.data)
             response.end()
             break;
     }

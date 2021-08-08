@@ -40,9 +40,7 @@ export function getRoutes(request: any, response: any) {
                     response.end();
                 } else {
 
-                    console.log(request.headers)
-                    let noEndpointResponse = noEndpoint(requestUrl)
-                    console.log("no endpoint for " + requestUrl.pathname)
+                    let noEndpointResponse = noEndpoint(request)
                     response.writeHead(noEndpointResponse.statusCode, noEndpointResponse.headers)
                     response.write(noEndpointResponse.data)
                     response.end()
